@@ -17,10 +17,10 @@ class SplunkForwarder < Formula
   private
 
   def executables
-    Dir['bin/*'] - %w(scripts setSplunkEnv)
+    Dir['splunkforwarder/bin/*'] - %w(scripts setSplunkEnv)
   end
 
   def support_files
-    Dir['{etc,lib,openssl,share}/*']
+    Dir['splunkforwarder/{etc,lib,openssl,share}/*']
   end
 end
