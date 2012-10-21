@@ -5,10 +5,18 @@ class SplunkForwarder < Formula
   homepage 'http://www.splunk.com'
   url 'http://www.splunk.com/page/download_track?file=4.3.4/universalforwarder/osx/splunkforwarder-4.3.4-136012-Darwin-universal.tgz&ac=&wget=true&name=wget&typed=releases'
   sha1 '7a6074edf8f67f442b9a2e853ba2912a1283731a'
+  keg_only 'Splunk forwarder includes an invasive number of binaries and support files.'
+
+  def caveats; <<-EOS.undent
+    This formula installs a wrapper executable at #{wrapper}. The
+    wrapper sets SPLUNK_HOME to #{prefix} and
+    launches #{real}.
+    EOS
+  end
 
   def install
-    install_support_files
-    install_executables
+    prefix.install Dir['*']
+    install_wrapper
   end
 
   def test
@@ -17,33 +25,22 @@ class SplunkForwarder < Formula
 
   private
 
-  def auxiliary_executables
-    Dir['bin/*'] - %w(bin/splunk bin/scripts bin/setSplunkEnv)
-  end
-
-  def install_executables
-    bin.install auxiliary_executables
-    libexec.install 'bin/splunk'
-    install_executable_wrapper
-  end
-
-  def install_executable_wrapper
-    bin.join('splunk').tap do |wrapper|
-      wrapper.open 'w' do |f|
-        f.puts <<-WRAPPER
-          #!/usr/bin/env SPLUNK_HOME=#{prefix.to_s.shellescape}
-          #{real_executable.to_s.shellescape} "$@"
-        WRAPPER
-      end
-      wrapper.chmod 0755
+  def install_wrapper
+    wrapper.open 'w' do |f|
+      f.puts <<-EOS.undent
+        #!/bin/bash
+        SPLUNK_HOME=#{prefix.to_s.shellescape}
+        #{real.to_s.shellescape} "$@"
+      EOS
     end
+    wrapper.chmod 0755
   end
 
-  def install_support_files
-    prefix.install %w(etc lib openssl)
+  def real
+    bin.join 'splunk'
   end
 
-  def real_executable
-    libexec.join 'splunk'
+  def wrapper
+    HOMEBREW_PREFIX.join 'bin', 'splunk'
   end
 end
