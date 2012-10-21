@@ -7,10 +7,11 @@ class SplunkForwarder < Formula
   sha1 '7a6074edf8f67f442b9a2e853ba2912a1283731a'
   keg_only 'Splunk forwarder includes an invasive number of binaries and support files.'
 
-  def caveats; <<-EOS.undent
-    This formula installs a wrapper executable at #{wrapper}. The
-    wrapper sets SPLUNK_HOME to #{prefix} and
-    launches #{real}.
+  def caveats
+    <<-EOS.undent
+      This formula installs a wrapper executable at #{wrapper}. The
+      wrapper sets SPLUNK_HOME to #{prefix} and
+      launches #{real}.
     EOS
   end
 
